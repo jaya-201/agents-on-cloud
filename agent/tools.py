@@ -23,7 +23,7 @@ def parse_json_response(text: str) -> dict:
 
 def build_messages(system_prompt: str, conversation: list[dict]) -> tuple[str, list[dict]]:
     """
-    Separate the system prompt from the messages list for the Anthropic API.
+    Separate the system prompt from the messages list for the LLM API.
     Returns (system_prompt, messages_list).
     """
     return system_prompt, conversation

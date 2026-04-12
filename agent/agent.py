@@ -16,7 +16,7 @@ import logging
 import os
 from typing import Any
 
-import anthropic
+import google.generativeai as genai
 
 from agent.prompts import MANAGER_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT, REVIEWER_SYSTEM_PROMPT
 from agent.tools import (
@@ -31,37 +31,41 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "gemini-flash-latest"
 MAX_TOKENS = 4096
 MAX_ITERATIONS = 5          # Safety cap: prevent infinite Writer↔Reviewer loops
 APPROVAL_THRESHOLD = 7      # Reviewer score >= 7 → approve
 
 
-# ── Anthropic client (lazy init for Lambda cold-start optimisation) ────────────
-_client: anthropic.Anthropic | None = None
+# ── Google GenAI client (lazy init for Lambda cold-start optimisation) ────────────
+_client_configured: bool = False
 
 
-def _get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    return _client
+def _get_client() -> genai:
+    global _client_configured
+    if not _client_configured:
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        _client_configured = True
+    return genai
 
 
 # ── Low-level LLM call ─────────────────────────────────────────────────────────
 def _call_llm(system: str, messages: list[dict], label: str = "agent") -> str:
-    """Call the Anthropic API and return the text content of the first response block."""
+    """Call the Google GenAI API and return the text content of the response."""
     client = _get_client()
     logger.info("[%s] calling LLM with %d message(s)", label, len(messages))
 
-    response = client.messages.create(
-        model=MODEL,
-        max_tokens=MAX_TOKENS,
-        system=system,
-        messages=messages,
+    model = client.GenerativeModel(
+        model_name=MODEL,
+        system_instruction=system,
+        generation_config=genai.types.GenerationConfig(max_output_tokens=MAX_TOKENS)
     )
 
-    text = response.content[0].text
+    # Assuming messages is a list with one user message
+    content = messages[0]["content"] if messages else ""
+    response = model.generate_content(content)
+
+    text = response.text
     logger.info("[%s] received %d chars", label, len(text))
     return text
 
