@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Frontend</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>✨ AI Agent Interface</h1>
+        
+        <div>
+            <textarea id="prompt" placeholder="Enter your prompt here... (e.g., Write a technical blog post about Graph Neural Networks)"></textarea>
+            <div style="display: flex; justify-content: flex-end;">
+                <button id="submit">Run Request</button>
+            </div>
+        </div>
+
+        <div id="result-container">
+            <h3>Result:</h3>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // TODO: Replace this with your actual AWS API Gateway URL
+        const API_URL = 'https://pt2bkr6clphqdwu5rjpdh5uuq40ktckc.lambda-url.eu-north-1.on.aws/';
+
+        const submitBtn = document.getElementById('submit');
+        const promptInput = document.getElementById('prompt');
+        const resultContainer = document.getElementById('result-container');
+        const resultDiv = document.getElementById('result');
+
+        submitBtn.addEventListener('click', async () => {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            if (API_URL === 'YOUR_API_GATEWAY_URL_HERE') {
+                alert('Please update the API_URL variable in the code with your actual API Gateway URL.');
+                return;
+            }
+
+            // UI Loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Running...';
+            resultContainer.style.display = 'block';
+            resultDiv.className = '';
+            resultDiv.textContent = 'Agent is processing your request... this may take a few moments.';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Display the final_content if present, else show the whole raw JSON response
+                    resultDiv.textContent = data.final_content || JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = data.error || 'An error occurred';
+                }
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = 'Network Error: ' + error.message;
+            } finally {
+                // Reset UI
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+            }
+        });
+    </script>
+</body>
+</html>

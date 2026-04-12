@@ -16,7 +16,6 @@ import logging
 import os
 from typing import Any
 
-import anthropic
 
 from agent.prompts import MANAGER_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT, REVIEWER_SYSTEM_PROMPT
 from agent.tools import (
