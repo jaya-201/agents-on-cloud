@@ -1,0 +1,62 @@
+# Python dependencies
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Installed packages
+google/
+grpc/
+requests/
+protobuf/
+google_generativeai/
+google_api_core/
+google_api_python_client/
+google_auth/
+google_auth_httplib2/
+googleapis_common_protos/
+grpcio/
+grpcio_status/
+httplib2/
+proto/
+proto_plus/
+pydantic/
+pyasn1/
+pyasn1_modules/
+pycparser/
+pyparsing/
+tqdm/
+typing_extensions/
+typing_inspection/
+uritemplate/
+urllib3/
+certifi/
+cffi/
+charset_normalizer/
+colorama/
+cryptography/
+idna/
+*.dist-info/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Deployment
+deployment.zip
+package/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+ 
