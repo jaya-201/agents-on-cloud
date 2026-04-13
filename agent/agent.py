@@ -15,6 +15,7 @@ import json
 import logging
 import os
 from typing import Any
+import google.generativeai as genai
 
 
 from agent.prompts import MANAGER_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT, REVIEWER_SYSTEM_PROMPT
